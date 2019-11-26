@@ -41,6 +41,8 @@ double doubling_time_prompt();
 
 double current_od_prompt();
 
+int menu_prompts();
+
 bool is_double(string& double_in) {
     try {
         stod(double_in);
@@ -106,7 +108,18 @@ public:
         return_double.second = final_volume - return_double.first;
         final_storage.push_back(return_double);
     }
-
+    
+    void announce_required_vols() {
+        cout << "\nTo backdilute from an OD of " << current_OD << " to " << desired_OD
+        << " by ";
+        desired_time.print_time();
+        cout << ", you need " << final_storage[num_cultures].first << "mLs of cells and "
+                            << final_storage[num_cultures].second << "mLs of media.\n\n";
+    }
+    
+    void menu_prompt_prompt() {
+        menu_prompt = menu_prompts();
+    }
     
     void run_initial() {
         set_current_time();
@@ -116,15 +129,39 @@ public:
         set_desired_od();
         set_final_volume();
         mLs_for_new_od();
+        announce_required_vols();
+        run_menu();
     }
     
     void run_another_culture() {
         set_current_od();
         mLs_for_new_od();
+        announce_required_vols();
     }
     
     void run_diff_culture() {
         
+    }
+    
+    void run_menu() {
+        menu_prompt_prompt();
+        while (menu_prompt != 4) {
+            if (menu_prompt == 1) {
+                num_cultures++;
+                run_another_culture();
+            }
+            else if (menu_prompt == 2) {
+                num_cultures++;
+                // FIXME do other stuff here
+            }
+            else if (menu_prompt == 3) {
+                list_all_ods();
+            }
+            else {
+                cout << "\nPlease enter a menu number:\n\n";
+            }
+            menu_prompt_prompt();
+        }
     }
     
     void list_all_ods() {
@@ -238,6 +275,18 @@ double current_od_prompt() {
     }
     double current_OD = atof(current_OD_string.c_str());
     return current_OD;
+}
+
+int menu_prompts() {
+    int exit_code;
+    cout << "[1] Do another culture with the same volume and doubling time\n";
+    cout << "[2] Do different cultures with a different volume and doubling time\n";
+    cout << "[3] List all OD dilutions\n";
+    cout << "[4] Quit\n\n";
+    string exit_string = "";
+    cin >> exit_string;
+    exit_code = atoi(exit_string.c_str());
+    return exit_code;
 }
 
 #endif /* userinterface_h */
